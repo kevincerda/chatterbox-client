@@ -69,6 +69,7 @@ class Application {
         var username, text;
         if (message.roomname === app.roomname) {
         username = message.username.replace(/[^a-zA-Z0-9.,:;+=~`]/g, '');
+        username = username.slice(0, 15);
           !message.text ? {} : 
             text = message.text.replace(/[^a-zA-Z0-9.,:;+=~`]/g, '');
             if (app.friends.includes(username)) { text = `<b>` + text + `</b>` };
@@ -81,15 +82,15 @@ class Application {
       }
     }
     this.chooseRoom = function(choice) {
-      app.roomname = choice.innerHTML;
-      $("#roomId").html(`You are in: ` + choice.innerHTML);
+      choice.innerHTML ? app.roomname = choice.innerHTML : app.roomname = choice;
+      $("#roomId").html(`You are in: ` + app.roomname);
       app.clearMessages();
       app.oldIds = [];
       app.fetch();
     }
     this.createRoom = function(roomName) {
       !app.roomList.includes(roomName) && app.roomList.push(roomName);
-      $("#roomList").append(roomName);
+      app.renderRoomList();
     }
     this.renderRoomList = function() {
       $("#roomList").empty();
@@ -108,26 +109,27 @@ class Application {
           app.friends.push(friend);
           $("#addFriend").html(`<div class="added"> *** friend added! *** </div>`);
           $(".added").fadeOut(2500);
-          for (var i = 0; i < 20; i++) {
-            app.renderMessage(app.messages[i]);
-          }
           app.renderFriendList();
           $("." + friend).css("font-weight", "bold");
         }
       }
     }
     this.deleteFriend = function(friend) {
+      var friend = friend.innerHTML.toString().split('<')[0];
       app.friends.splice(app.friends.indexOf(friend), 1);
+      console.log(app.friends);
       $("#addFriend").html(`<div class="added"> *** friend deleted *** </div>`);
       $(".added").fadeOut(2500);
       app.renderFriendList();
+      $("." + friend).css("font-weight", "normal");
     }
     this.renderFriendList = function() {
       $("#friendList").empty();
-      app.friends.forEach(function(friend) {
-        $("#friendList").append(`<div class="friendOnList">` + friend + `<img onclick="app.deleteFriend(${friend.innerHTML})" 
-          src="images/delete.png" height="14px" style="float:right" /> </div>`);
-      });
+      for (var i = 0; i < app.friends.length; i++) {
+        var friend = app.friends[i];
+      $("#friendList").append(`<div class="friendOnList" id="` + friend + `">` + friend + `<img onclick="app.deleteFriend(${friend})" 
+        src="images/delete.png" height="14px" style="float:right" /> </div>`);
+      }
     }
     this.handleSubmit = function(message) {
       var message = {
@@ -135,7 +137,6 @@ class Application {
         text: $("#message").val(),
         roomname: app.roomname,
       }
-      console.log(message);
       this.renderMessage(message);
       this.send(message);
     }

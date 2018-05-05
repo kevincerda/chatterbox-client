@@ -30,6 +30,11 @@
       <br />
       <div id="roomId">You are in: lobby</div>
       <br />
+      <div>
+      <input type="text" id="newRoom">
+      <input class="submitRoom" type="submit" id="sendNewRoom" value="Create new room"></input>
+      </div>
+      <br />
       <div id="roomDropdown" class="dropdown">
         <button onclick="showRooms()" id="roomSelect" type="button" class="dropbtn">Room List</button>
         <div id="roomList" class="drop-content">
@@ -41,10 +46,12 @@
         </div>
       </div>
       <div id="addFriend"></div>
+      <div>
       <div id="chats"></div>
       <input type="text" id="message">
       <input class="submit" type="submit" id="send"></input>
       <br />
+      </div>
     </div>
         <script>
         $("#message").keyup(function(event) {
@@ -54,6 +61,12 @@
           let message = $("#message").val();
           app.handleSubmit(message);
           $("#message").val('');
+        });
+        $(".submitRoom").click(function() {
+          var room = $("#newRoom").val();
+          app.createRoom(room);
+          app.chooseRoom(room);
+          $("#newRoom").val('');
         });
         // $(".username").click(function() {
         //   console.log('this: ', this);
