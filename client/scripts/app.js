@@ -1,7 +1,10 @@
 // YOUR CODE HERE:
 class Application {
   constructor() {
+    this.username = window.location.search.substr(10);
+    this.friends = [];
     this.roomname = 'lobby';
+    this.roomList = [];
     this.messages = [];
     this.oldIds = [];
     this.init = function() {
@@ -10,12 +13,14 @@ class Application {
         for (var i = 0; i < 20; i++) {
           app.renderMessage(app.messages[i]);
         }
+        app.renderRoomList();
       }, 1000);
       setInterval(function() {
         app.fetch();
         for (var i = 0; i < 20; i++) {
             app.renderMessage(app.messages[i]);
         }
+        app.renderRoomList();
       }, 3000);
     }
     this.send = function(message) {
@@ -50,52 +55,87 @@ class Application {
           app.messages.sort(function(a, b) {
             return (b.createdAt) > (a.createdAt);
           });
+          app.messages.forEach(function(m) {
+            m.roomname !== undefined && !app.roomList.includes(m.roomname) && app.roomList.push(m.roomname);
+          });
         }
       });
     },
     this.clearMessages = function() {
-      $.ajax({
-        url: 'http://parse.la.hackreactor.com/chatterbox/classes/messages/index.html',
-        type: 'POST',
-        data: JSON.stringify($("#chats").empty()),
-        dataType: 'json',
-        contentType: 'application/json',
-        success: function (data) {
-          console.log('delete success');
-         },
-        error: function (data) {
-          console.error('delete failed', data);
-        }
-      });
+      $("#chats").empty();
     },
     this.renderMessage = function(message) {
-      var username, text;
-      if (message.roomname === app.roomname) {
-        !message.username ? username = 'anonymous' :
-          username = message.username.replace(/[^a-zA-Z0-9.,:;+=~`]/g, '');
-        !message.text ? {} : 
-          text = message.text.replace(/[^a-zA-Z0-9.,:;+=~`]/g, '');
-          if (!app.oldIds.includes(message.objectId)) {
-            $("#chats").append(`<div id="` + message.objectId + `">` + moment(message.createdAt).format('MMM Do, h:mm:ss a') + ' - ' + username + ': ' + text + `</div>`);
-          } 
-        app.oldIds.push(message.objectId);
+      if (message.roomname && message.username) {
+        var username, text;
+        if (message.roomname === app.roomname) {
+        username = message.username.replace(/[^a-zA-Z0-9.,:;+=~`]/g, '');
+          !message.text ? {} : 
+            text = message.text.replace(/[^a-zA-Z0-9.,:;+=~`]/g, '');
+            if (app.friends.includes(username)) { text = `<b>` + text + `</b>` };
+            if (!app.oldIds.includes(message.objectId)) {
+              $("#chats").append(`<div id="` + message.objectId + `">` + moment(message.createdAt).format('MMM Do, h:mm:ss a') 
+                + ' - ' + `<div class="user" onclick="app.handleUsernameClick(this)">${username}</div>: <div class="${username}" style="display: inline-block">${text}</div></div>`);
+            } 
+          app.oldIds.push(message.objectId);
+        }
       }
     }
-    this.renderRoom = function(roomName) {
-      app.roomname = roomName;
+    this.chooseRoom = function(choice) {
+      app.roomname = choice.innerHTML;
+      $("#roomId").html(`You are in: ` + choice.innerHTML);
+      app.clearMessages();
+      app.oldIds = [];
+      app.fetch();
     }
     this.createRoom = function(roomName) {
-      $("#roomSelect").append(roomName);
+      !app.roomList.includes(roomName) && app.roomList.push(roomName);
+      $("#roomList").append(roomName);
     }
-    this.handleUsernameClick = function(username) {
-      $("#friends").append(`<span>` + {username} + `</span>`);
+    this.renderRoomList = function() {
+      $("#roomList").empty();
+      for (var i = 0; i < app.roomList.length; i++) {
+        var room = app.roomList[i];
+        $("#roomList").append(`<div class="room" onclick="app.chooseRoom(this)">${room}</div>`);
+      };
+    }
+    this.handleUsernameClick = function(user) {
+      var friend = user.innerHTML;
+      if (friend === "anonymous") {
+        $("#addFriend").html(`<div class="anon">'anonymous' doesn't want to be your friend.</div>`);
+        $(".anon").fadeOut(2500);
+      } else {
+        if (!app.friends.includes(friend) && friend !== app.username) {
+          app.friends.push(friend);
+          $("#addFriend").html(`<div class="added"> *** friend added! *** </div>`);
+          $(".added").fadeOut(2500);
+          for (var i = 0; i < 20; i++) {
+            app.renderMessage(app.messages[i]);
+          }
+          app.renderFriendList();
+          $("." + friend).css("font-weight", "bold");
+        }
+      }
+    }
+    this.deleteFriend = function(friend) {
+      app.friends.splice(app.friends.indexOf(friend), 1);
+      $("#addFriend").html(`<div class="added"> *** friend deleted *** </div>`);
+      $(".added").fadeOut(2500);
+      app.renderFriendList();
+    }
+    this.renderFriendList = function() {
+      $("#friendList").empty();
+      app.friends.forEach(function(friend) {
+        $("#friendList").append(`<div class="friendOnList">` + friend + `<img onclick="app.deleteFriend(${friend.innerHTML})" 
+          src="images/delete.png" height="14px" style="float:right" /> </div>`);
+      });
     }
     this.handleSubmit = function(message) {
       var message = {
-        username: '',
+        username: app.username,
         text: $("#message").val(),
-        roomname: 'lobby'
+        roomname: app.roomname,
       }
+      console.log(message);
       this.renderMessage(message);
       this.send(message);
     }

@@ -7,10 +7,15 @@ body {
     font-family: arial, sans-serif;
 }
 
+#addFriend {
+    height: 20px;
+    text-align: center;
+}
+
 #main {
     position: relative;
     width: 500px;
-    height: 80%;
+    height: 680px;
     margin: 10% auto;
     text-align: left;
     background: #DDD;
@@ -21,6 +26,8 @@ body {
 
 #chats {
     width: 450px;
+    height: 350px;
+    overflow: scroll;
     margin: auto;
     text-align: left;
     background: white;
@@ -68,6 +75,14 @@ body {
     margin: 15px;
 }
 
+#send {
+    width: 55px;
+}
+
+#roomId {
+    padding: 0px 20px;
+}
+
 form {
     padding: 20px;
     padding-left: 0;
@@ -83,7 +98,12 @@ form input[type=text] {
 
 input {
     width: 75%;
-    height: 50px;
+    height: 30px;
+    display: inline-block;
+}
+
+.anon, .added {
+  color: #03D
 }
 
 .chat {
@@ -110,12 +130,22 @@ input {
     padding: 10px;
 }
 
-.friend {
-    color: #fff;
-    background-color: #0090da;
+.user {
+    font-weight: bold;
+    display: inline-block;
 }
 
+.friendOnList {
+    color: #fff;
+    background-color: #5AC;
+    padding: 7px 7px;
+}
 
+.room {
+    color: #fff;
+    background-color: #5AC;
+    padding: 7px 7px;
+}
 
 .dropbtn {
     background-color: white;
@@ -164,7 +194,7 @@ input {
     z-index: 1;
 }
 
-.drop-content a {
+.drop-content a, .drop-content2 a {
     color: black;
     padding: 12px 16px;
     text-decoration: none;

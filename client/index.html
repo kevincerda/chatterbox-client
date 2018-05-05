@@ -27,22 +27,20 @@
   <body>
     <div id="main">
       <h1>chatterbox</h1>
+      <br />
+      <div id="roomId">You are in: lobby</div>
+      <br />
       <div id="roomDropdown" class="dropdown">
         <button onclick="showRooms()" id="roomSelect" type="button" class="dropbtn">Room List</button>
         <div id="roomList" class="drop-content">
-        <div onclick="app.renderRoom('lobby')"><a href="#">lobby</a></div>
-        <div onclick="app.renderRoom('room2')"><a href="#">room2</a></div>
-        <div onclick="app.renderRoom('room3')"><a href="#">room3</a></div>
         </div>
       </div>
       <div id="friendDropdown" class="dropdown2">
         <button onclick="showFriends()" id="friendSelect" type="button" class="dropbtn">Friend List</button>
         <div id="friendList" class="drop-content">
-        <div onclick="app.renderRoom('lobby')"><a href="#">friend</a></div>
-        <div onclick="app.renderRoom('room2')"><a href="#">friend2</a></div>
-        <div onclick="app.renderRoom('room3')"><a href="#">friend3</a></div>
         </div>
       </div>
+      <div id="addFriend"></div>
       <div id="chats"></div>
       <input type="text" id="message">
       <input class="submit" type="submit" id="send"></input>
@@ -57,10 +55,10 @@
           app.handleSubmit(message);
           $("#message").val('');
         });
-        $(".username").click(function() {
-          app.handleUsernameClick(".username");
-        });
+        // $(".username").click(function() {
+        //   console.log('this: ', this);
+        //   app.handleUsernameClick();
+        // });
       </script>
-    <div id="friends"></div>
   </body>
 </html>
