@@ -1,6 +1,7 @@
 // YOUR CODE HERE:
 class Application {
   constructor() {
+    this.roomname = 'lobby';
     this.messages = [];
     this.oldIds = [];
     this.init = function() {
@@ -69,17 +70,22 @@ class Application {
     },
     this.renderMessage = function(message) {
       var username, text;
-      !message.username ? username = 'anonymous' :
-        username = message.username.replace(/[^a-zA-Z0-9.,:;+=~`]/g, '');
-      !message.text ? {} : 
-        text = message.text.replace(/[^a-zA-Z0-9.,:;+=~`]/g, '');
-        if (!app.oldIds.includes(message.objectId)) {
-          $("#chats").append(`<div id="` + message.objectId + `">` + moment(message.createdAt).format('MMM Do, h:mm:ss a') + ' - ' + username + ': ' + text + `</div>`);
-        } 
-      app.oldIds.push(message.objectId);
+      if (message.roomname === app.roomname) {
+        !message.username ? username = 'anonymous' :
+          username = message.username.replace(/[^a-zA-Z0-9.,:;+=~`]/g, '');
+        !message.text ? {} : 
+          text = message.text.replace(/[^a-zA-Z0-9.,:;+=~`]/g, '');
+          if (!app.oldIds.includes(message.objectId)) {
+            $("#chats").append(`<div id="` + message.objectId + `">` + moment(message.createdAt).format('MMM Do, h:mm:ss a') + ' - ' + username + ': ' + text + `</div>`);
+          } 
+        app.oldIds.push(message.objectId);
+      }
     }
     this.renderRoom = function(roomName) {
-      $("#roomSelect").append(`<div>` + {roomName} + `</div`)
+      app.roomname = roomName;
+    }
+    this.createRoom = function(roomName) {
+      $("#roomSelect").append(roomName);
     }
     this.handleUsernameClick = function(username) {
       $("#friends").append(`<span>` + {username} + `</span>`);
@@ -101,3 +107,23 @@ var app = new Application();
 $( document ).ready(function() {
   app.init();
 });
+
+function showRooms() {
+    document.getElementById("roomList").classList.toggle("show");
+}
+
+function showFriends() {
+    document.getElementById("friendList").classList.toggle("show");
+}
+
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+    var dropdowns = document.getElementsByClassName("drop-content", "drop-content2");
+    for (var i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
