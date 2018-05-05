@@ -2,6 +2,7 @@
 class Application {
   constructor() {
     this.messages = [];
+    this.oldIds = [];
     this.init = function() {
       this.fetch();
       setTimeout(function() {
@@ -9,15 +10,22 @@ class Application {
           app.renderMessage(app.messages[i]);
         }
       }, 1000);
-    },
+      setInterval(function() {
+        app.fetch();
+        for (var i = 0; i < 20; i++) {
+            app.renderMessage(app.messages[i]);
+        }
+      }, 3000);
+    }
     this.send = function(message) {
       $.ajax({
         url: 'http://parse.la.hackreactor.com/chatterbox/classes/messages',
         type: 'POST',
         data: JSON.stringify(message),
         contentType: 'application/json',
-        success: function (data) {
-          console.log('chatterbox: Message sent');
+        success: function (response) {
+          console.log('chatterbox: Message sent')
+          app.oldIds.push(response.objectId);
          },
         error: function (data) {
           console.error('chatterbox: Failed to send message', data);
@@ -29,15 +37,19 @@ class Application {
         url: 'http://parse.la.hackreactor.com/chatterbox/classes/messages',
         type: 'GET',
         data: "order=-createdAt",
-        //data: JSON.stringify(response),
         dataType: 'json',
         contentType: 'application/json',
         success: function (data) {
           app.messages = data.results;
-         },
+        },
         error: function (data) {
           console.error('get failed', data);
         },
+        complete: function() {
+          app.messages.sort(function(a, b) {
+            return (b.createdAt) > (a.createdAt);
+          });
+        }
       });
     },
     this.clearMessages = function() {
@@ -59,9 +71,12 @@ class Application {
       var username, text;
       !message.username ? username = 'anonymous' :
         username = message.username.replace(/[^a-zA-Z0-9.,:;+=~`]/g, '');
-      !message.text ? text = ' ' : 
+      !message.text ? {} : 
         text = message.text.replace(/[^a-zA-Z0-9.,:;+=~`]/g, '');
-      $("#chats").prepend(`<div>` + moment(message.createdAt).format('MMM Do, h:mm:ss a') + ' - ' + username + ': ' + text + `</div>`);
+        if (!app.oldIds.includes(message.objectId)) {
+          $("#chats").append(`<div id="` + message.objectId + `">` + moment(message.createdAt).format('MMM Do, h:mm:ss a') + ' - ' + username + ': ' + text + `</div>`);
+        } 
+      app.oldIds.push(message.objectId);
     }
     this.renderRoom = function(roomName) {
       $("#roomSelect").append(`<div>` + {roomName} + `</div`)
@@ -75,6 +90,7 @@ class Application {
         text: $("#message").val(),
         roomname: 'lobby'
       }
+      this.renderMessage(message);
       this.send(message);
     }
   }

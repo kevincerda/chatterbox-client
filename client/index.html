@@ -31,13 +31,15 @@
       <input type="text" id="message">
       <input class="submit" type="submit" id="send"></input>
       <br />
-      <br />
-      <button onclick="app.fetch()">fetch</button>
     </div>
         <script>
+        $("#message").keyup(function(event) {
+          event.keyCode === 13 && $(".submit").click();
+        });
         $(".submit").click(function() {
           let message = $("#message").val();
           app.handleSubmit(message);
+          $("#message").val('');
         });
         $(".username").click(function() {
           app.handleUsernameClick(".username");
