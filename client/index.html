@@ -7,6 +7,8 @@
 
     <!-- dependencies -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/moment/moment.js"></script>
     <script>
       // YOU DO NOT NEED TO EDIT THIS CODE
       if (!/(&|\?)username=/.test(window.location.search)) {
@@ -25,8 +27,22 @@
   <body>
     <div id="main">
       <h1>chatterbox</h1>
-      <!-- Your HTML goes here! -->
+      <div id="chats"></div>
+      <input type="text" id="message">
+      <input class="submit" type="submit" id="send"></input>
+      <br />
+      <br />
+      <button onclick="app.fetch()">fetch</button>
     </div>
-    <div id="chats"></div>
+        <script>
+        $(".submit").click(function() {
+          let message = $("#message").val();
+          app.handleSubmit(message);
+        });
+        $(".username").click(function() {
+          app.handleUsernameClick(".username");
+        });
+      </script>
+    <div id="friends"></div>
   </body>
 </html>
